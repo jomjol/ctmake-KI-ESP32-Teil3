@@ -27,11 +27,22 @@ static const char *TAG = "main";
 
 using namespace std;
 
-bool Init_SDCard_GPIO()
+bool Init_SDCard_GPIO(bool _onebitmode)
 {
-    ESP_LOGI(TAG, "Initializing SD card");
+    ESP_LOGI(TAG, "Initializing SD card\n");
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
-    host.flags = SDMMC_HOST_FLAG_1BIT;    
+
+    if (_onebitmode)
+    {
+        host.flags = SDMMC_HOST_FLAG_1BIT;
+        printf("SD-Card using 1-line connection mode. Not compatible with all SD-Cards.\n");
+    }
+    else  
+    {
+        host.flags = SDMMC_HOST_FLAG_4BIT;
+        printf("SD-Card using 4-line connection mode. GPIO12/13 is used by SD-Card.\n");
+    }
+  
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
     esp_vfs_fat_sdmmc_mount_config_t mount_config = { };
     mount_config.format_if_mount_failed = false;

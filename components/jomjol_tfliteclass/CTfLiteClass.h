@@ -14,6 +14,8 @@
 #include "esp_log.h"
 
 
+
+
 class CTfLiteClass
 {
     protected:
@@ -34,13 +36,14 @@ class CTfLiteClass
 
         long GetFileSize(std::string filename);
         unsigned char* ReadFileToCharArray(std::string _fn);
-        
+
+        void MakeAllocate();
+
     public:
-        CTfLiteClass();
+        CTfLiteClass(int _memsize = 600*1024);                // _memsize = Speichergröße für interne Datenablage und Berechnungen von TfLite Micro
         ~CTfLiteClass();        
         void LoadModelFromFile(std::string _fn);
         void LoadModelFromCharArray(unsigned char *_input);
-        void MakeAllocate();
         void GetInputTensorSize();
         bool LoadInputImage(std::string _fn);
         void Invoke();

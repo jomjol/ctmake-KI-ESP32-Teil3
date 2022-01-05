@@ -4,7 +4,7 @@
 using namespace std;
 
 
-bool Init_SDCard_GPIO();
+bool Init_SDCard_GPIO(bool _onebitmode = false);
 
 bool CheckPSRAM();
 

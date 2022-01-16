@@ -64,7 +64,9 @@ void CTfLiteClass::GetInputDimension(bool silent)
 	TfLiteTensor* input2 = this->interpreter->input(0);
 
 	int numdim = input2->dims->size;
-	if (!silent)  printf("Anzahl Ausgangsdimensionen: %d\n", numdim - 1);  
+
+
+	if (!silent) printf("Anzahl Eingangsdimensionen: %d\n", numdim - 1);  
 
 	int sizeofdim;
 	for (int j = 1; j < numdim; ++j)
@@ -77,19 +79,28 @@ void CTfLiteClass::GetInputDimension(bool silent)
 	}
 }
 
-void CTfLiteClass::GetOutputDimension(bool silent)
+int CTfLiteClass::GetOutputDimension(bool silent)
 {
 	TfLiteTensor* output2 = this->interpreter->output(0);
 
 	int numdim = output2->dims->size;
-	printf("Anzahl Ausgangsdimensionen: %d\n", numdim - 1);  
 
-	int sizeofdim;
-	for (int j = 1; j < numdim; ++j)
+	if (!silent)
 	{
-		sizeofdim = output2->dims->data[j];
-		printf("  Größe Dimension %d: %d\n", j, sizeofdim);  
+		printf("Anzahl Ausgangsdimensionen: %d\n", numdim - 1);  
+
+		int sizeofdim;
+		for (int j = 1; j < numdim; ++j)
+		{
+			sizeofdim = output2->dims->data[j];
+			printf("  Größe Dimension %d: %d\n", j, sizeofdim);  
+		}
 	}
+
+	if (numdim > 0)
+		return output2->dims->data[numdim-1];
+
+	return 0;
 }
 
 void CTfLiteClass::GetOutPut()
@@ -238,7 +249,12 @@ void CTfLiteClass::LoadModelFromCharArray(unsigned char *_input){
 	TFLITE_MINIMAL_CHECK(model != nullptr); 		
 
 	if (model)
+	{
 		MakeAllocate(); 
+		GetInputDimension(true);
+	}
+	else
+		printf("Problem beim Laden des Models!\n");
 }
 
 
@@ -251,7 +267,8 @@ CTfLiteClass::CTfLiteClass(int _memsize)
 	output = nullptr;  
 	kTensorArenaSize = _memsize;
 	tensor_arena = (uint8_t*) malloc(kTensorArenaSize);
-//    tensor_arena = new uint8_t[kTensorArenaSize]; 
+	if (!tensor_arena)
+		printf("CTfLiteClass - Speicher (kTensorArenaSize) konnte nicht allokiert werden\n");
 }
 
 CTfLiteClass::~CTfLiteClass()

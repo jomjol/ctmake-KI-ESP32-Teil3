@@ -32,7 +32,9 @@ class CTfLiteClass
 
         float* input;
         int input_i;
-        int im_height, im_width, im_channel;
+        int im_height = -1;
+        int im_width = -1;
+        int im_channel = -1;
 
         long GetFileSize(std::string filename);
         unsigned char* ReadFileToCharArray(std::string _fn);
@@ -53,7 +55,7 @@ class CTfLiteClass
 
         float GetOutputValue(int nr);
         void GetInputDimension(bool silent = false);
-        void GetOutputDimension(bool silent = false);
+        int GetOutputDimension(bool silent = false);
 
 };
 

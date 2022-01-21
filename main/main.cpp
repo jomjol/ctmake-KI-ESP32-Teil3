@@ -101,15 +101,14 @@ void ErweitertesBeispiel()
     uint32_t starttime, stoptime, loadtime, calctime, loadtime_sum, calctime_sum;
     std::string name_tflite, name_image;
     int tflite, image;
-    int num_tflite = 4;
+    std::string neuralnetwork_files[3] = {"small.tfl", "middle.tfl", "large.tfl"};
 
-    for (tflite = 0; tflite < num_tflite; ++tflite)
+    for (tflite = 0; tflite < 3; ++tflite)
     { 
-        name_tflite = "/sdcard/ext_exam/digit" + std::to_string(tflite) + ".tfl";
-        printf("\n====== Model %s ====================\n  ", name_tflite.c_str());
+        printf("\n====== Model %s ====================\n  ", neuralnetwork_files[tflite].c_str());
         starttime = esp_log_timestamp();
         classtflite = new CTfLiteClass; 
-        classtflite->LoadModelFromFile(name_tflite); 
+        classtflite->LoadModelFromFile("/sdcard/ext_exam/" + neuralnetwork_files[tflite]); 
         stoptime = esp_log_timestamp();
         printf("Model loading time: %dms\n  ", stoptime-starttime);
         loadtime_sum = 0; 

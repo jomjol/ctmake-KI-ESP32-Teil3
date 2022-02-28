@@ -17,25 +17,8 @@ float CTfLiteClass::GetOutputValue(int nr)
 }
 
 
-int CTfLiteClass::GetClassFromImage(std::string _fn)
-{
-//  printf("Before Load image %s\n", _fn.c_str());
-		if (!LoadInputImage(_fn))
-			return -1000;
-//  printf("After Load image %s\n", _fn.c_str());
-
-		Invoke();
-	printf("After Invoke %s\n", _fn.c_str());
-
-		return GetOutClassification();
-//    return 0;
-}
-
 int CTfLiteClass::GetOutClassification()
 {
-//  printf("test\n");
-
-
 	float zw_max = 0;
 	float zw;
 	int zw_class = -1;
@@ -45,7 +28,7 @@ int CTfLiteClass::GetOutClassification()
 		return -1;
 
 	int numeroutput = output2->dims->data[1];
-//  printf("Anzahl Output: %d\n", numeroutput);
+
 	for (int i = 0; i < numeroutput; ++i)
 	{
 		zw = output2->data.f[i];
@@ -55,7 +38,6 @@ int CTfLiteClass::GetOutClassification()
 				zw_class = i;
 		}
 	}
-//  printf("Result Ziffer: %d\n", zw_class);       
 	return zw_class;
 }
 
@@ -103,31 +85,6 @@ int CTfLiteClass::GetOutputDimension(bool silent)
 	return 0;
 }
 
-void CTfLiteClass::GetOutPut()
-{
-	TfLiteTensor* output2 = this->interpreter->output(0);
-
-	int numdim = output2->dims->size;
-	printf("NumDimension: %d\n", numdim);  
-
-	int sizeofdim;
-	for (int j = 0; j < numdim; ++j)
-	{
-		sizeofdim = output2->dims->data[j];
-		printf("SizeOfDimension %d: %d\n", j, sizeofdim);  
-	}
-
-
-	float fo;
-
-	// Process the inference results.
-	int numeroutput = output2->dims->data[1];
-	for (int i = 0; i < numeroutput; ++i)
-	{
-	 fo = output2->data.f[i];
-		printf("Result %d: %f\n", i, fo);  
-	}
-}
 
 void CTfLiteClass::Invoke()
 {
@@ -144,6 +101,12 @@ bool CTfLiteClass::LoadInputImage(std::string _fn)
 	unsigned char red, green, blue;
 	
 	rgb_image = stbi_load(_fn.c_str(), &width, &height, &bpp, channels);
+
+	if (!rgb_image)
+	{
+		printf("\n!!! ERROR - Bilddatei konnte nicht geladen werden (%s). !!!\n\n", _fn.c_str());
+		return false;
+	}
 
 	if ((width != im_width) || (height != im_height)) 
 	{
@@ -194,14 +157,6 @@ void CTfLiteClass::MakeAllocate()
 
 }
 
-void CTfLiteClass::GetInputTensorSize(){
-		float *zw = this->input;
-		int test = sizeof(zw);
-		printf("Input Tensor Dimension: %d\n", test);       
-
-		printf("Input Tensor Dimension: %d\n", test);   
-}
-
 long CTfLiteClass::GetFileSize(std::string filename)
 {
 		struct stat stat_buf;
@@ -236,25 +191,33 @@ unsigned char* CTfLiteClass::ReadFileToCharArray(std::string _fn)
 	return result;
 }
 
-void CTfLiteClass::LoadModelFromFile(std::string _fn){
+bool CTfLiteClass::LoadModelFromFile(std::string _fn)
+{
 	LoadedModelDescription_tflite = ReadFileToCharArray(_fn.c_str());
-	LoadModelFromCharArray(LoadedModelDescription_tflite);
+	if (!LoadedModelDescription_tflite)
+	{
+		printf("\nModelfile konnte nicht geladen werden (%s).\n", _fn.c_str());
+		return false;
+	}
+	return LoadModelFromCharArray(LoadedModelDescription_tflite);
 }
 
-void CTfLiteClass::LoadModelFromCharArray(unsigned char *_input){
+bool CTfLiteClass::LoadModelFromCharArray(unsigned char *_input){
 	static tflite::MicroErrorReporter micro_error_reporter;
 	error_reporter = &micro_error_reporter;
 
 	model = tflite::GetModel(_input);
 	TFLITE_MINIMAL_CHECK(model != nullptr); 		
 
-	if (model)
+	if (!model)
 	{
-		MakeAllocate(); 
-		GetInputDimension(true);
-	}
-	else
 		printf("Problem beim Laden des Models!\n");
+		return false;
+	}
+
+	MakeAllocate(); 
+	GetInputDimension(true);
+	return true;
 }
 
 

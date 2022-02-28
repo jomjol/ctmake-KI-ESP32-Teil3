@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string>
+#include "esp_log.h"
 
 #include "CTfLiteClass.h"
 #include "Helper.h"
@@ -34,8 +35,8 @@ extern "C" void app_main(void)
     */
     printf("Lade tflite-Model\n");
 
-    neuralnetwork->LoadModelFromFile("/sdcard/dig-01.tfl");         // dynamisch
-//    neuralnetwork->LoadModelFromCharArray(tflite_model);          // statisch
+    if (!neuralnetwork->LoadModelFromFile("/sdcard/dig-01.tfl")) return;   // dynamisch
+//    if (!neuralnetwork->LoadModelFromCharArray(tflite_model)) return;      // statisch
 
     printf("\nGröße Eingangs-Layer:\n");
     neuralnetwork->GetInputDimension();
@@ -44,8 +45,9 @@ extern "C" void app_main(void)
     printf("\n");
 
     printf("Lade Bilddaten...\n");
-    image_file = "/sdcard/number3.bmp";
-    neuralnetwork->LoadInputImage(image_file.c_str());
+    image_file = "/sdcard/digit3a.jpg";
+    if (!neuralnetwork->LoadInputImage(image_file.c_str()))
+        return;
 
     printf("Berechne neuronales Netz ...\n\n");
     neuralnetwork->Invoke();
@@ -62,17 +64,19 @@ extern "C" void app_main(void)
  
     printf("  CNN-Klassifizierung: %d\n", (int) result);
 
-    printf("\n\nLade Bilddaten...\n");
-    image_file = "/sdcard/number2.jpg";
-    neuralnetwork->LoadInputImage(image_file.c_str());
 
+
+    printf("\n\nLade Bilddaten...\n");
+    image_file = "/sdcard/digit1.jpg";
+    if (!neuralnetwork->LoadInputImage(image_file.c_str()))
+        return;
     printf("Berechne neuronales Netz ...\n\n");
     neuralnetwork->Invoke();
-
     printf("Frage Ergebnis ab ...\n");
     result = neuralnetwork->GetOutClassification();
- 
     printf("%s: CNN-Klassifizierung: %d\n", image_file.c_str(), (int) result);
+
+
 
     printf("\nHerzlichen Glückwunsch!\n\n\n");
     delete neuralnetwork;       // Freigeben des Speichers
@@ -117,7 +121,7 @@ void ErweitertesBeispiel()
 
         for (image = 0; image < 5; ++image)
         {
-            name_image = "/sdcard/digit" + std::to_string(image) + ".bmp";
+            name_image = "/sdcard/ext_exam/digit" + std::to_string(image) + ".bmp";
 
             classtflite->LoadInputImage(name_image);
 

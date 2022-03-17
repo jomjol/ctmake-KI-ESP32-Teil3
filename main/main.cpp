@@ -31,12 +31,19 @@ extern "C" void app_main(void)
     Die Beschreibung des neuronalen Netzes kann entweder von der tflite-Datei von der SD-Karte
     geladen werden oder als CharArray aus der Header-Datei (siehe include) eingebunden werden.
 
-    Die entsprechende Optin muss unten ausgewählt werden:
+    Die entsprechende Option muss unten ausgewählt werden. Falls das File nicht geladen werden kann,
+    wird das Programm beendet.
     */
     printf("Lade tflite-Model\n");
 
-    if (!neuralnetwork->LoadModelFromFile("/sdcard/dig-01.tfl")) return;   // dynamisch
-//    if (!neuralnetwork->LoadModelFromCharArray(tflite_model)) return;      // statisch
+
+    if (!neuralnetwork->LoadModelFromFile("/sdcard/dig-01.tfl")) // dynamisch
+        return;
+
+    /*
+    if (!neuralnetwork->LoadModelFromCharArray(tflite_model))   //  statisch
+        return;
+    */
 
     printf("\nGröße Eingangs-Layer:\n");
     neuralnetwork->GetInputDimension();

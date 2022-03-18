@@ -14,7 +14,6 @@ extern "C" {
 #include "sdmmc_cmd.h"
 #include "driver/sdmmc_host.h"
 #include "driver/sdmmc_defs.h"
-
 #include "driver/gpio.h"
 
 #include <stdio.h>
@@ -22,8 +21,6 @@ extern "C" {
 #include "esp_console.h"
 #include "esp_vfs_dev.h"
 #include "driver/uart.h"
-
-
 
 #include <string.h>
 #include <esp_log.h>
